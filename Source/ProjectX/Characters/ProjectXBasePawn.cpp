@@ -4,7 +4,7 @@
 #include "ProjectXBasePawn.h"
 
 #include "Components/SphereComponent.h"
-#include "GameFramework/FloatingPawnMovement.h"
+#include "ProjectX/Components/MovementComponents/ProjectXBasePawnMovementComponent.h"
 
 // Sets default values
 AProjectXBasePawn::AProjectXBasePawn()
@@ -13,8 +13,9 @@ AProjectXBasePawn::AProjectXBasePawn()
 	CollisionComponent->SetSphereRadius(50.f);
 	CollisionComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 	RootComponent = CollisionComponent;
-	
-	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>(TEXT("Movement component"));
+
+	// MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>(TEXT("Movement component"));
+	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UProjectXBasePawnMovementComponent>(TEXT("Movement component"));
 	MovementComponent->SetUpdatedComponent(CollisionComponent);
 }
 
@@ -26,6 +27,7 @@ void AProjectXBasePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("MoveForward", this, &AProjectXBasePawn::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AProjectXBasePawn::MoveRight);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AProjectXBasePawn::Jump);
 }
 
 void AProjectXBasePawn::MoveForward(float Value)
@@ -33,7 +35,7 @@ void AProjectXBasePawn::MoveForward(float Value)
 	if (Value != 0.f)
 	{
 		AddMovementInput(GetActorForwardVector(), Value);
-	} 
+	}
 }
 
 void AProjectXBasePawn::MoveRight(float Value)
@@ -41,6 +43,12 @@ void AProjectXBasePawn::MoveRight(float Value)
 	if (Value != 0.f)
 	{
 		AddMovementInput(GetActorRightVector(), Value);
-	} 
+	}
 }
 
+void AProjectXBasePawn::Jump()
+{
+	checkf(MovementComponent->IsA<UProjectXBasePawnMovementComponent>(), TEXT("AProjectXBasePawn::Jump can work only with UProjectXBasePawnMovementComponent"))
+	UProjectXBasePawnMovementComponent* BaseMovement = StaticCast<UProjectXBasePawnMovementComponent*>(MovementComponent);
+	BaseMovement->JumpStart();
+}
