@@ -56,8 +56,14 @@ protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
 	APlatformTrigger* PlatformTrigger;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ReturnDelay = 3.f;
+
 private:
 	FTimeline PlatformTimeline;
 
 	void PlatformTimelineUpdate(float Alpha);
+	void OnPlatformTimelineFinished();
+
+	FTimerHandle ReturnTimerHandle;
 };

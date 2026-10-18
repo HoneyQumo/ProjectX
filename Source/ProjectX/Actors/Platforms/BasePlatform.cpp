@@ -39,11 +39,12 @@ void ABasePlatform::BeginPlay()
 		PlatformMovementTimelineUpdate.BindUObject(this, &ABasePlatform::PlatformTimelineUpdate);
 		PlatformTimeline.AddInterpFloat(TimelineCurve, PlatformMovementTimelineUpdate);
 
+		FOnTimelineEventStatic PlatformTimelineFinished;
+		PlatformTimelineFinished.BindUObject(this, &ABasePlatform::OnPlatformTimelineFinished);
+		PlatformTimeline.SetTimelineFinishedFunc(PlatformTimelineFinished);
+
 		if (PlatformBehavior == EPlatformBehavior::Loop)
 		{
-			FOnTimelineEventStatic PlatformTimelineFinished;
-			PlatformTimelineFinished.BindUObject(this, &ABasePlatform::OnPlatformTriggered);
-			PlatformTimeline.SetTimelineFinishedFunc(PlatformTimelineFinished);
 			OnPlatformTriggered();
 		}
 	}
@@ -60,8 +61,26 @@ void ABasePlatform::PlatformTimelineUpdate(float Alpha)
 	PlatformMesh->SetRelativeLocation(PlatformTargetLocation);
 }
 
+void ABasePlatform::OnPlatformTimelineFinished()
+{
+	switch (PlatformBehavior)
+	{
+	case EPlatformBehavior::OnDemand:
+		if (!PlatformTimeline.IsReversing() && ReturnDelay > 0.f)
+		{
+			GetWorldTimerManager().SetTimer(ReturnTimerHandle, this, &ABasePlatform::OnPlatformTriggered, ReturnDelay, false);
+		}
+
+		break;
+	case EPlatformBehavior::Loop:
+		OnPlatformTriggered();
+		break;
+	}
+}
+
 void ABasePlatform::OnPlatformTriggered()
 {
+	GetWorldTimerManager().ClearTimer(ReturnTimerHandle);
 	const bool bIsAtStart = FMath::IsNearlyZero(PlatformTimeline.GetPlaybackPosition());
 
 	if (PlatformTimeline.IsReversing() || bIsAtStart)
