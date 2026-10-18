@@ -2,6 +2,7 @@
 
 
 #include "BasePlatform.h"
+#include "PlatformTrigger.h"
 
 // Sets default values
 ABasePlatform::ABasePlatform()
@@ -45,6 +46,11 @@ void ABasePlatform::BeginPlay()
 			PlatformTimeline.SetTimelineFinishedFunc(PlatformTimelineFinished);
 			OnPlatformTriggered();
 		}
+	}
+
+	if (IsValid(PlatformTrigger))
+	{
+		PlatformTrigger->OnInvocatorActivated.AddDynamic(this, &ABasePlatform::OnPlatformTriggered);
 	}
 }
 

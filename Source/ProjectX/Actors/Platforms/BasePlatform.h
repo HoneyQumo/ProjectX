@@ -14,6 +14,8 @@ enum class EPlatformBehavior : uint8
 	Loop // платформа перемещается по циклу
 };
 
+class APlatformTrigger;
+
 UCLASS()
 class PROJECTX_API ABasePlatform : public AActor
 {
@@ -29,6 +31,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable)
+	void OnPlatformTriggered();
 
 	//Статическая геометрия самой платформы
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -48,10 +53,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EPlatformBehavior PlatformBehavior = EPlatformBehavior::OnDemand;
 
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+	APlatformTrigger* PlatformTrigger;
+
 private:
 	FTimeline PlatformTimeline;
 
 	void PlatformTimelineUpdate(float Alpha);
-
-	void OnPlatformTriggered();
 };
