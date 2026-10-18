@@ -4,6 +4,7 @@
 #include "ProjectXBasePawn.h"
 
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "ProjectX/Components/MovementComponents/ProjectXBasePawnMovementComponent.h"
 
 // Sets default values
@@ -34,7 +35,7 @@ void AProjectXBasePawn::MoveForward(float Value)
 {
 	if (Value != 0.f)
 	{
-		AddMovementInput(GetActorForwardVector(), Value);
+		AddMovementInput(CurrentViewActor->GetActorForwardVector(), Value);
 	}
 }
 
@@ -42,7 +43,7 @@ void AProjectXBasePawn::MoveRight(float Value)
 {
 	if (Value != 0.f)
 	{
-		AddMovementInput(GetActorRightVector(), Value);
+		AddMovementInput(CurrentViewActor->GetActorRightVector(), Value);
 	}
 }
 
@@ -51,4 +52,17 @@ void AProjectXBasePawn::Jump()
 	checkf(MovementComponent->IsA<UProjectXBasePawnMovementComponent>(), TEXT("AProjectXBasePawn::Jump can work only with UProjectXBasePawnMovementComponent"))
 	UProjectXBasePawnMovementComponent* BaseMovement = StaticCast<UProjectXBasePawnMovementComponent*>(MovementComponent);
 	BaseMovement->JumpStart();
+}
+
+void AProjectXBasePawn::BeginPlay()
+{
+	Super::BeginPlay();
+	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	CurrentViewActor = CameraManager->GetViewTarget();
+	CameraManager->OnBlendComplete().AddUFunction(this, FName("OnBlendComplete"));
+}
+
+void AProjectXBasePawn::OnBlendComplete()
+{
+	CurrentViewActor = GetController()->GetViewTarget();
 }
