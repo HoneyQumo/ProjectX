@@ -5,6 +5,7 @@
 
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "ProjectX/ProjectX.h"
 #include "ProjectX/Components/MovementComponents/ProjectXBasePawnMovementComponent.h"
 
 // Sets default values
@@ -64,5 +65,6 @@ void AProjectXBasePawn::BeginPlay()
 
 void AProjectXBasePawn::OnBlendComplete()
 {
+	UE_LOG(LogCameras, Log, TEXT("AProjectXBasePawn::OnBlendComplete() Current view actor: %s"), *CurrentViewActor->GetName())
 	CurrentViewActor = GetController()->GetViewTarget();
 }
