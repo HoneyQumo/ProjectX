@@ -7,6 +7,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "ProjectX/ProjectX.h"
 #include "ProjectX/Components/MovementComponents/ProjectXBasePawnMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogProjectXBasePawn, Log, All);
 
 // Sets default values
 AProjectXBasePawn::AProjectXBasePawn()
@@ -14,11 +18,24 @@ AProjectXBasePawn::AProjectXBasePawn()
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	CollisionComponent->SetSphereRadius(50.f);
 	CollisionComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
-	RootComponent = CollisionComponent;
+	SetRootComponent(CollisionComponent);
 
-	// MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>(TEXT("Movement component"));
 	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UProjectXBasePawnMovementComponent>(TEXT("Movement component"));
 	MovementComponent->SetUpdatedComponent(CollisionComponent);
+
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArmComponent->SetupAttachment(RootComponent);
+	SpringArmComponent->TargetArmLength = 500.f;
+	SpringArmComponent->bUsePawnControlRotation = true;
+
+	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
+	ThirdPersonCamera->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
+
+	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FirstPersonCamera->SetupAttachment(RootComponent);
+	FirstPersonCamera->SetRelativeLocation(FVector(0.f, 0.f, 40.f));
+	FirstPersonCamera->bUsePawnControlRotation = true;
+	FirstPersonCamera->SetAutoActivate(false);
 }
 
 // Called to bind functionality to input
@@ -30,6 +47,7 @@ void AProjectXBasePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("MoveForward", this, &AProjectXBasePawn::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AProjectXBasePawn::MoveRight);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AProjectXBasePawn::Jump);
+	PlayerInputComponent->BindAction("SwitchCamera", IE_Pressed, this, &AProjectXBasePawn::SwitchCamera);
 }
 
 void AProjectXBasePawn::MoveForward(float Value)
@@ -65,6 +83,15 @@ void AProjectXBasePawn::BeginPlay()
 
 void AProjectXBasePawn::OnBlendComplete()
 {
-	UE_LOG(LogCameras, Log, TEXT("AProjectXBasePawn::OnBlendComplete() Current view actor: %s"), *CurrentViewActor->GetName())
 	CurrentViewActor = GetController()->GetViewTarget();
+	UE_LOG(LogCameras, Log, TEXT("AProjectXBasePawn::OnBlendComplete() Current view actor: %s"), *CurrentViewActor->GetName());
+}
+
+void AProjectXBasePawn::SwitchCamera()
+{
+	const bool bIsFirstPerson = FirstPersonCamera->IsActive();
+	FirstPersonCamera->SetActive(!bIsFirstPerson);
+	ThirdPersonCamera->SetActive(bIsFirstPerson);
+
+	UE_LOG(LogProjectXBasePawn, Log, TEXT("AProjectXBasePawn::SwitchCamera() turn on: %s"), bIsFirstPerson ? TEXT("ThirdPersonCamera") : TEXT("FirstPersonCamera"));
 }

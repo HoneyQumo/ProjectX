@@ -17,26 +17,34 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	class UPawnMovementComponent* MovementComponent;
-	
+
 	UPROPERTY(VisibleAnywhere)
 	class USphereComponent* CollisionComponent;
 
-public:	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void Jump();
-	
+
 protected:
 	virtual void BeginPlay() override;
-	
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USpringArmComponent* SpringArmComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UCameraComponent* ThirdPersonCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UCameraComponent* FirstPersonCamera;
+
 private:
 	UFUNCTION()
 	void OnBlendComplete();
-	
-	AActor* CurrentViewActor;
 
+	void SwitchCamera();
+
+	AActor* CurrentViewActor;
 };
