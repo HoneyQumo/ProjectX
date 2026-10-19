@@ -18,32 +18,31 @@ void UProjectXBasePawnMovementComponent::TickComponent(float DeltaTime, enum ELe
 
 	if (bEnableGravity)
 	{
-		
 		FHitResult HitResult;
 		FVector StartPoint = UpdatedComponent->GetComponentLocation();
-		float TraceDepth = -GetGravityZ() * DeltaTime;
+		float TraceDepth = 10.f;
 		float SphereHalfRadius = UpdatedComponent->Bounds.SphereRadius / 2;
-		float LineTraceLength = TraceDepth + SphereHalfRadius;
+		float LineTraceLength = SphereHalfRadius + TraceDepth;
 		FVector EndPoint = StartPoint - LineTraceLength * FVector::UpVector;
-		
+
 		FCollisionQueryParams CollisionQueryParams;
 		CollisionQueryParams.AddIgnoredActor(GetOwner());
-		
-		FCollisionShape CollisionShape = FCollisionShape::MakeSphere(SphereHalfRadius);
+
 		bool bWasFalling = bIsFalling;
+		FCollisionShape CollisionShape = FCollisionShape::MakeSphere(SphereHalfRadius);
 		bIsFalling = !GetWorld()->SweepSingleByChannel(HitResult, StartPoint, EndPoint, FQuat::Identity, ECC_Visibility, CollisionShape, CollisionQueryParams);
-		
+
 		if (bIsFalling)
 		{
 			VerticalVelocity += GetGravityZ() * DeltaTime * FVector::UpVector;
-		} else if (bWasFalling)
+		}
+		else if (bWasFalling && VerticalVelocity.Z < 0.f)
 		{
 			VerticalVelocity = FVector::ZeroVector;
 		}
-		
-		Velocity += VerticalVelocity;
 	}
 
+	Velocity += VerticalVelocity;
 	FVector Delta = Velocity * DeltaTime;
 	if (!Delta.IsNearlyZero(1e-6f))
 	{
@@ -58,6 +57,7 @@ void UProjectXBasePawnMovementComponent::TickComponent(float DeltaTime, enum ELe
 			SlideAlongSurface(Delta, 1.f - Hit.Time, Hit.Normal, Hit, true);
 		}
 	}
+
 	UpdateComponentVelocity();
 }
 
