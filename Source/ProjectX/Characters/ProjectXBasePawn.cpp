@@ -9,6 +9,7 @@
 #include "ProjectX/Components/MovementComponents/ProjectXBasePawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/ArrowComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogProjectXBasePawn, Log, All);
 
@@ -22,6 +23,9 @@ AProjectXBasePawn::AProjectXBasePawn()
 
 	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UProjectXBasePawnMovementComponent>(TEXT("Movement component"));
 	MovementComponent->SetUpdatedComponent(CollisionComponent);
+
+	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
+	ArrowComponent->SetupAttachment(RootComponent);
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComponent->SetupAttachment(RootComponent);
@@ -52,6 +56,7 @@ void AProjectXBasePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AProjectXBasePawn::MoveForward(float Value)
 {
+	InputForward = Value;
 	if (Value != 0.f)
 	{
 		AddMovementInput(CurrentViewActor->GetActorForwardVector(), Value);
@@ -60,6 +65,7 @@ void AProjectXBasePawn::MoveForward(float Value)
 
 void AProjectXBasePawn::MoveRight(float Value)
 {
+	InputRight = Value;
 	if (Value != 0.f)
 	{
 		AddMovementInput(CurrentViewActor->GetActorRightVector(), Value);

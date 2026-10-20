@@ -28,8 +28,17 @@ public:
 	void MoveRight(float Value);
 	void Jump();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetInputForward() { return InputForward; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetInputRight() { return InputRight; }
+
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UArrowComponent* ArrowComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USpringArmComponent* SpringArmComponent;
@@ -47,4 +56,7 @@ private:
 	void SwitchCamera();
 
 	AActor* CurrentViewActor;
+
+	float InputForward = 0.f;
+	float InputRight = 0.f;
 };
