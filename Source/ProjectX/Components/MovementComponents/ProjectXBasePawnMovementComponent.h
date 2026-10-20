@@ -13,9 +13,11 @@ class PROJECTX_API UProjectXBasePawnMovementComponent : public UPawnMovementComp
 	GENERATED_BODY()
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+
 public:
 	void JumpStart();
+
+	virtual bool IsFalling() const override;
 
 protected:
 	UPROPERTY(EditAnywhere)

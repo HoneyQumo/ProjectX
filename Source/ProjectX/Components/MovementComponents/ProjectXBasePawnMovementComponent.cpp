@@ -65,3 +65,8 @@ void UProjectXBasePawnMovementComponent::JumpStart()
 {
 	VerticalVelocity = InitialJumpVelocity * FVector::UpVector;
 }
+
+bool UProjectXBasePawnMovementComponent::IsFalling() const
+{
+	return bIsFalling;
+}
