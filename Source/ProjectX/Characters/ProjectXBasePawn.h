@@ -37,16 +37,21 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UArrowComponent* ArrowComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Base pawn")
+	float CollisionSphereRadius = 50.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+#if	WITH_EDITORONLY_DATA
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Base pawn")
+	class UArrowComponent* ArrowComponent;
+#endif
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Base pawn")
 	class USpringArmComponent* SpringArmComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Base pawn")
 	class UCameraComponent* ThirdPersonCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Base pawn")
 	class UCameraComponent* FirstPersonCamera;
 
 private:

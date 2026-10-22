@@ -16,21 +16,25 @@ DEFINE_LOG_CATEGORY_STATIC(LogProjectXBasePawn, Log, All);
 // Sets default values
 AProjectXBasePawn::AProjectXBasePawn()
 {
+	bUseControllerRotationYaw = true;
+
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
-	CollisionComponent->SetSphereRadius(50.f);
+	CollisionComponent->SetSphereRadius(CollisionSphereRadius);
 	CollisionComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 	SetRootComponent(CollisionComponent);
 
 	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UProjectXBasePawnMovementComponent>(TEXT("Movement component"));
 	MovementComponent->SetUpdatedComponent(CollisionComponent);
 
+#if	WITH_EDITORONLY_DATA
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
 	ArrowComponent->SetupAttachment(RootComponent);
+#endif
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->TargetArmLength = 500.f;
-	SpringArmComponent->bUsePawnControlRotation = true;
+	SpringArmComponent->bUsePawnControlRotation = 1;
+	SpringArmComponent->SetupAttachment(RootComponent);
 
 	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
 	ThirdPersonCamera->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
