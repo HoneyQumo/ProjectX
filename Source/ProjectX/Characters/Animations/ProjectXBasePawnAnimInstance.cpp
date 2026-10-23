@@ -26,4 +26,5 @@ void UProjectXBasePawnAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	InputForward = CachedBasePawn->GetInputForward();
 	InputRight = CachedBasePawn->GetInputRight();
 	bIsInAir = CachedBasePawn->GetMovementComponent()->IsFalling();
+	Speed = CachedBasePawn->GetVelocity().Size2D();
 }

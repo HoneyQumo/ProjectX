@@ -29,6 +29,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = "Base Pawn Animation Instance")
 	bool bIsInAir;
 
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "Base Pawn Animation Instance")
+	float Speed;
+	
 private:
 	TWeakObjectPtr<class AProjectXBasePawn> CachedBasePawn;
 };
