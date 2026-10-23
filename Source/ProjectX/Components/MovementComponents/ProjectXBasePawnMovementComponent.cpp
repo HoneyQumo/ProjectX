@@ -36,9 +36,19 @@ void UProjectXBasePawnMovementComponent::TickComponent(float DeltaTime, enum ELe
 		{
 			VerticalVelocity += GetGravityZ() * DeltaTime * FVector::UpVector;
 		}
-		else if (bWasFalling && VerticalVelocity.Z < 0.f)
+		else
 		{
-			VerticalVelocity = FVector::ZeroVector;
+			if (bWasFalling && VerticalVelocity.Z < 0.f)
+			{
+				VerticalVelocity = FVector::ZeroVector;
+			}
+
+			const float GroundGap = HitResult.Distance - SphereHalfRadius;
+			if (VerticalVelocity.Z <= 0.f && GroundGap > 0.f)
+			{
+				FHitResult SnapHit;
+				SafeMoveUpdatedComponent(-GroundGap * FVector::UpVector, UpdatedComponent->GetComponentQuat(), true, SnapHit);
+			}
 		}
 	}
 
