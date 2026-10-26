@@ -1,0 +1,66 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "ProjectXBaseCharacter.generated.h"
+
+class UPXBaseCharacterMovementComponent;
+
+UCLASS(Abstract, NotBlueprintable)
+class PROJECTX_API AProjectXBaseCharacter : public ACharacter
+{
+	GENERATED_BODY()
+
+public:
+	AProjectXBaseCharacter(const FObjectInitializer& ObjectInitializer);
+
+	virtual void MoveForward(float Value)
+	{
+	};
+
+	virtual void MoveRight(float Value)
+	{
+	};
+
+	virtual void Turn(float Value)
+	{
+	};
+
+	virtual void LookUp(float Value)
+	{
+	};
+
+	// virtual void Jump() override
+	// {
+	// };
+
+	virtual void ChangeCrouchState();
+
+	virtual void StartSprint();
+	virtual void StopSprint();
+
+	virtual void Tick(float DeltaSeconds) override;
+
+	FORCEINLINE UPXBaseCharacterMovementComponent* GetBaseCharacterMovementComponent() { return PXBaseCharacterMovementComponent; }
+
+protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Character | Movement")
+	void OnSprintStart();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Character | Movement")
+	void OnSprintEnd();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character | Movement")
+	float SprintSpeed = 800.f;
+
+	virtual bool CanSprint();
+
+	UPXBaseCharacterMovementComponent* PXBaseCharacterMovementComponent;
+
+private:
+	void TryChangeSprintState();
+
+	bool bIsSprintRequested = false;
+};
