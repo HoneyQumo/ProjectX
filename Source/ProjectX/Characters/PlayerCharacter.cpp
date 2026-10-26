@@ -24,6 +24,13 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 }
 
+void APlayerCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	SprintCameraTimeline.TickTimeline(DeltaSeconds);
+}
+
 void APlayerCharacter::MoveForward(float Value)
 {
 	Super::MoveForward(Value);
@@ -84,10 +91,42 @@ bool APlayerCharacter::CanJumpInternal_Implementation() const
 
 void APlayerCharacter::OnJumped_Implementation()
 {
-	// Super::OnJumped_Implementation();
+	Super::OnJumped_Implementation();
 
 	if (bIsCrouched)
 	{
 		UnCrouch();
 	}
+}
+
+void APlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	DefaultArmLength = SpringArmComponent->TargetArmLength;
+	SprintCameraTimeline.SetTimelineLengthMode(TL_LastKeyFrame);
+
+	if (IsValid(SprintCameraCurve))
+	{
+		FOnTimelineFloatStatic SprintTimelineUpdate;
+		SprintTimelineUpdate.BindUObject(this, &APlayerCharacter::SprintCameraTimelineUpdate);
+		SprintCameraTimeline.AddInterpFloat(SprintCameraCurve, SprintTimelineUpdate);
+	}
+}
+
+void APlayerCharacter::OnSprintStart_Implementation()
+{
+	Super::OnSprintStart_Implementation();
+	SprintCameraTimeline.Play();
+}
+
+void APlayerCharacter::OnSprintEnd_Implementation()
+{
+	Super::OnSprintEnd_Implementation();
+	SprintCameraTimeline.Reverse();
+}
+
+void APlayerCharacter::SprintCameraTimelineUpdate(float Alpha)
+{
+	SpringArmComponent->TargetArmLength = FMath::Lerp(DefaultArmLength, SprintArmLength, Alpha);
 }

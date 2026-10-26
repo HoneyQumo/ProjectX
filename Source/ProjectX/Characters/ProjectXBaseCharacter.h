@@ -46,11 +46,13 @@ public:
 	FORCEINLINE UPXBaseCharacterMovementComponent* GetBaseCharacterMovementComponent() { return PXBaseCharacterMovementComponent; }
 
 protected:
-	UFUNCTION(BlueprintImplementableEvent, Category = "Character | Movement")
+	UFUNCTION(BlueprintNativeEvent, Category = "Character | Movement")
 	void OnSprintStart();
+	virtual void OnSprintStart_Implementation();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Character | Movement")
+	UFUNCTION(BlueprintNativeEvent, Category = "Character | Movement")
 	void OnSprintEnd();
+	virtual void OnSprintEnd_Implementation();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character | Movement")
 	float SprintSpeed = 800.f;

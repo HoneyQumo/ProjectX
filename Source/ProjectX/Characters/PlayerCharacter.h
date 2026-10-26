@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ProjectXBaseCharacter.h"
+#include "Components/TimelineComponent.h"
 #include "PlayerCharacter.generated.h"
 
 /**
@@ -16,6 +17,8 @@ class PROJECTX_API APlayerCharacter : public AProjectXBaseCharacter
 
 public:
 	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
+
+	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void MoveForward(float Value) override;
 	virtual void MoveRight(float Value) override;
@@ -34,4 +37,20 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character | Camera")
 	class USpringArmComponent* SpringArmComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Character | Camera")
+	UCurveFloat* SprintCameraCurve;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Character | Camera")
+	float SprintArmLength = 400.f;
+
+	virtual void BeginPlay() override;
+
+	virtual void OnSprintStart_Implementation() override;
+	virtual void OnSprintEnd_Implementation() override;
+
+private:
+	FTimeline SprintCameraTimeline;
+	float DefaultArmLength = 0.f;
+	void SprintCameraTimelineUpdate(float Alpha);
 };

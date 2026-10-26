@@ -46,6 +46,14 @@ void AProjectXBaseCharacter::Tick(float DeltaSeconds)
 	TryChangeSprintState();
 }
 
+void AProjectXBaseCharacter::OnSprintStart_Implementation()
+{
+}
+
+void AProjectXBaseCharacter::OnSprintEnd_Implementation()
+{
+}
+
 bool AProjectXBaseCharacter::CanSprint()
 {
 	return true;
