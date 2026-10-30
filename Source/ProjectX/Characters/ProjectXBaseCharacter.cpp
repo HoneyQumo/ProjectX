@@ -4,12 +4,15 @@
 #include "ProjectXBaseCharacter.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ProjectX/Components/LedgeDetectorComponent.h"
 #include "ProjectX/Components/MovementComponents/PXBaseCharacterMovementComponent.h"
 
 AProjectXBaseCharacter::AProjectXBaseCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	ObjectInitializer.SetDefaultSubobjectClass<UPXBaseCharacterMovementComponent>(CharacterMovementComponentName))
 {
 	PXBaseCharacterMovementComponent = StaticCast<UPXBaseCharacterMovementComponent*>(GetCharacterMovement());
+
+	LedgeDetectorComponent = CreateDefaultSubobject<ULedgeDetectorComponent>(TEXT("LedgeDetector"));
 }
 
 void AProjectXBaseCharacter::ChangeCrouchState()
@@ -44,6 +47,16 @@ void AProjectXBaseCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	TryChangeSprintState();
+}
+
+void AProjectXBaseCharacter::Mantle()
+{
+	FLedgeDescription LedgeDescription;
+
+	if (LedgeDetectorComponent->DetectLedge(LedgeDescription))
+	{
+		//todo: activate mantling	
+	}
 }
 
 void AProjectXBaseCharacter::OnSprintStart_Implementation()

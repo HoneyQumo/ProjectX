@@ -26,6 +26,7 @@ private:
 	void Turn(float Value);
 	void LookUp(float Value);
 	void ChangeCrouchState();
+	void Mantle();
 	void Jump();
 
 	void StartSprint();

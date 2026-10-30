@@ -23,6 +23,7 @@ void AProjectXPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("SwimRight", this, &AProjectXPlayerController::SwimRight);
 	InputComponent->BindAxis("SwimUp", this, &AProjectXPlayerController::SwimUp);
 	InputComponent->BindAction("Crouch", IE_Pressed, this, &AProjectXPlayerController::ChangeCrouchState);
+	InputComponent->BindAction("Mantle", IE_Pressed, this, &AProjectXPlayerController::Mantle);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AProjectXPlayerController::Jump);
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AProjectXPlayerController::StartSprint);
 	InputComponent->BindAction("Sprint", IE_Released, this, &AProjectXPlayerController::StopSprint);
@@ -65,6 +66,14 @@ void AProjectXPlayerController::ChangeCrouchState()
 	if (CachedBaseCharacter.IsValid())
 	{
 		CachedBaseCharacter->ChangeCrouchState();
+	}
+}
+
+void AProjectXPlayerController::Mantle()
+{
+	if (CachedBaseCharacter.IsValid())
+	{
+		CachedBaseCharacter->Mantle();
 	}
 }
 

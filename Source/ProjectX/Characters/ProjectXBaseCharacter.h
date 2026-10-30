@@ -56,6 +56,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void Mantle();
+
 	FORCEINLINE UPXBaseCharacterMovementComponent* GetBaseCharacterMovementComponent() { return PXBaseCharacterMovementComponent; }
 
 protected:
@@ -73,6 +75,9 @@ protected:
 	virtual bool CanSprint();
 
 	UPXBaseCharacterMovementComponent* PXBaseCharacterMovementComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Movement")
+	class ULedgeDetectorComponent* LedgeDetectorComponent;
 
 private:
 	void TryChangeSprintState();
