@@ -19,6 +19,9 @@ void AProjectXPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("MoveRight", this, &AProjectXPlayerController::MoveRight);
 	InputComponent->BindAxis("Turn", this, &AProjectXPlayerController::Turn);
 	InputComponent->BindAxis("LookUp", this, &AProjectXPlayerController::LookUp);
+	InputComponent->BindAxis("SwimForward", this, &AProjectXPlayerController::SwimForward);
+	InputComponent->BindAxis("SwimRight", this, &AProjectXPlayerController::SwimRight);
+	InputComponent->BindAxis("SwimUp", this, &AProjectXPlayerController::SwimUp);
 	InputComponent->BindAction("Crouch", IE_Pressed, this, &AProjectXPlayerController::ChangeCrouchState);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AProjectXPlayerController::Jump);
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AProjectXPlayerController::StartSprint);
@@ -86,5 +89,29 @@ void AProjectXPlayerController::StopSprint()
 	if (CachedBaseCharacter.IsValid())
 	{
 		CachedBaseCharacter->StopSprint();
+	}
+}
+
+void AProjectXPlayerController::SwimForward(float Value)
+{
+	if (CachedBaseCharacter.IsValid())
+	{
+		CachedBaseCharacter->SwimForward(Value);
+	}
+}
+
+void AProjectXPlayerController::SwimRight(float Value)
+{
+	if (CachedBaseCharacter.IsValid())
+	{
+		CachedBaseCharacter->SwimRight(Value);
+	}
+}
+
+void AProjectXPlayerController::SwimUp(float Value)
+{
+	if (CachedBaseCharacter.IsValid())
+	{
+		CachedBaseCharacter->SwimUp(Value);
 	}
 }

@@ -31,5 +31,9 @@ private:
 	void StartSprint();
 	void StopSprint();
 
+	void SwimForward(float Value);
+	void SwimRight(float Value);
+	void SwimUp(float Value);
+
 	TSoftObjectPtr<class AProjectXBaseCharacter> CachedBaseCharacter;
 };

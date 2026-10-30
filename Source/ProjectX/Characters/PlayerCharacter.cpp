@@ -35,7 +35,7 @@ void APlayerCharacter::MoveForward(float Value)
 {
 	Super::MoveForward(Value);
 
-	if (!FMath::IsNearlyZero(Value, 1e-6f))
+	if ((GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling()) && !FMath::IsNearlyZero(Value, 1e-6f))
 	{
 		FRotator YawRotator(0.f, GetControlRotation().Yaw, 0.f);
 		FVector ForwardVector = YawRotator.RotateVector(FVector::ForwardVector);
@@ -48,11 +48,10 @@ void APlayerCharacter::MoveRight(float Value)
 {
 	Super::MoveRight(Value);
 
-	if (!FMath::IsNearlyZero(Value, 1e-6f))
+	if ((GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling()) && !FMath::IsNearlyZero(Value, 1e-6f))
 	{
 		FRotator YawRotator(0.f, GetControlRotation().Yaw, 0.f);
 		FVector RightVector = YawRotator.RotateVector(FVector::RightVector);
-		// AddMovementInput(GetActorRightVector(), Value);
 		AddMovementInput(RightVector, Value);
 	}
 }
@@ -69,6 +68,40 @@ void APlayerCharacter::LookUp(float Value)
 	Super::LookUp(Value);
 
 	AddControllerPitchInput(Value);
+}
+
+void APlayerCharacter::SwimForward(float Value)
+{
+	Super::SwimForward(Value);
+
+	if (GetCharacterMovement()->IsSwimming() && !FMath::IsNearlyZero(Value, 1e-6f))
+	{
+		FRotator PitchYawRotator(GetControlRotation().Pitch, GetControlRotation().Yaw, 0.f);
+		FVector ForwardVector = PitchYawRotator.RotateVector(FVector::ForwardVector);
+		AddMovementInput(ForwardVector, Value);
+	}
+}
+
+void APlayerCharacter::SwimRight(float Value)
+{
+	Super::SwimRight(Value);
+
+	if (GetCharacterMovement()->IsSwimming() && !FMath::IsNearlyZero(Value, 1e-6f))
+	{
+		FRotator YawRotator(0.f, GetControlRotation().Yaw, 0.f);
+		FVector RightVector = YawRotator.RotateVector(FVector::RightVector);
+		AddMovementInput(RightVector, Value);
+	}
+}
+
+void APlayerCharacter::SwimUp(float Value)
+{
+	Super::SwimUp(Value);
+
+	if (GetCharacterMovement()->IsSwimming() && !FMath::IsNearlyZero(Value, 1e-6f))
+	{
+		AddMovementInput(FVector::UpVector, Value);
+	}
 }
 
 void APlayerCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)

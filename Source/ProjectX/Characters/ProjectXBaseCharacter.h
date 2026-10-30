@@ -41,6 +41,19 @@ public:
 	virtual void StartSprint();
 	virtual void StopSprint();
 
+	virtual void SwimForward(float Value)
+	{
+	};
+
+	virtual void SwimRight(float Value)
+	{
+	};
+
+	virtual void SwimUp(float Value)
+	{
+	};
+
+
 	virtual void Tick(float DeltaSeconds) override;
 
 	FORCEINLINE UPXBaseCharacterMovementComponent* GetBaseCharacterMovementComponent() { return PXBaseCharacterMovementComponent; }
