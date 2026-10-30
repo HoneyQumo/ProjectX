@@ -28,4 +28,5 @@ void UProjectXBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSecond
 	bIsFalling = CharacterMovementComponent->IsFalling();
 	bIsCrouching = CharacterMovementComponent->IsCrouching();
 	bIsSprinting = CharacterMovementComponent->IsSprinting();
+	bIsSwimming = CharacterMovementComponent->IsSwimming();
 }
