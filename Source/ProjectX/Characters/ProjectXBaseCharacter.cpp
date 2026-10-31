@@ -60,6 +60,7 @@ void AProjectXBaseCharacter::Mantle()
 	if (LedgeDetectorComponent->DetectLedge(LedgeDescription))
 	{
 		GetBaseCharacterMovementComponent()->StartMantle(LedgeDescription);
+		PlayAnimMontage(HighMantleMontage);
 	}
 }
 
