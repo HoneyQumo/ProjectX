@@ -1,8 +1,10 @@
 ﻿#include "LedgeDetectorComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
-#include "ProjectX/ProjectXTypes.h"
-#include "ProjectX/Utils/PXTraceUtils.h"
+#include "Kismet/GameplayStatics.h"
+#include "../ProjectXTypes.h"
+#include "../Subsystems/DebugSubsystem.h"
+#include "../Utils/PXTraceUtils.h"
 
 
 void ULedgeDetectorComponent::BeginPlay()
@@ -21,6 +23,15 @@ bool ULedgeDetectorComponent::DetectLedge(FLedgeDescription& LedgeDescription)
 	QueryParams.bTraceComplex = true;
 	QueryParams.AddIgnoredActor(GetOwner());
 
+#if ENABLE_DRAW_DEBUG
+	UDebugSubsystem* DebugSubsystem = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UDebugSubsystem>();
+	bool IsDebugEnabled = DebugSubsystem->isCategoryEnabled(DebudCategoryLedgeDetection);
+#else
+	bool IsDebugEnabled = false;
+#endif
+
+	float DrawTime = 2.f;
+
 	float BottomZOffset = 2.f;
 	FVector CharacterBottom = CachedCharacterOwner->GetActorLocation() - (CapsuleComponent->GetScaledCapsuleHalfHeight() - BottomZOffset) * FVector::UpVector;
 
@@ -32,13 +43,12 @@ bool ULedgeDetectorComponent::DetectLedge(FLedgeDescription& LedgeDescription)
 	FVector ForwardStartLocation = CharacterBottom + (MinimumLedgeHeight + ForwardCheckCapsuleHalfHeight) * FVector::UpVector;
 	FVector ForwardEndLocation = ForwardStartLocation + CachedCharacterOwner->GetActorForwardVector() * ForwardCheckDistance;
 
-	float DrawTime = 2.f;
 
 	if (!PXTraceUtils::SweepCapsuleSingleByChannel(
 		GetWorld(), ForwardCheckHitResult, ForwardStartLocation,
 		ForwardEndLocation, ForwardCheckCapsuleRadius, ForwardCheckCapsuleHalfHeight,
 		FQuat::Identity, ECC_Climbing, QueryParams,
-		FCollisionResponseParams::DefaultResponseParam, true, DrawTime
+		FCollisionResponseParams::DefaultResponseParam, IsDebugEnabled, DrawTime
 	))
 	{
 		return false;
@@ -57,7 +67,7 @@ bool ULedgeDetectorComponent::DetectLedge(FLedgeDescription& LedgeDescription)
 		DownwardStartLocation, DownwardEndLocation,
 		DownwardSphereCheckRadius, ECC_Climbing,
 		QueryParams, FCollisionResponseParams::DefaultResponseParam,
-		true, DrawTime
+		IsDebugEnabled, DrawTime
 	))
 	{
 		return false;
@@ -72,7 +82,7 @@ bool ULedgeDetectorComponent::DetectLedge(FLedgeDescription& LedgeDescription)
 
 	if (PXTraceUtils::OverlapCapsuleAnyByProfile(
 		GetWorld(), OverlapLocation, OverlapCapsuleRadius, OverlapCapsuleHalfHeight,
-		FQuat::Identity, FName("Pawn"), QueryParams, true, DrawTime
+		FQuat::Identity, CollisionProfilePawn, QueryParams, IsDebugEnabled, DrawTime
 	))
 	{
 		return false;
