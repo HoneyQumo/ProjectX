@@ -29,6 +29,47 @@ void UPXBaseCharacterMovementComponent::StopSprint()
 	bForceMaxAccel = 0;
 }
 
+void UPXBaseCharacterMovementComponent::StartMantle(const FLedgeDescription& LedgeDescription)
+{
+	TargetLedge = LedgeDescription;
+	SetMovementMode(MOVE_Custom, static_cast<uint8>(ECustomMovementMode::CMOVE_Mantling));
+}
+
+void UPXBaseCharacterMovementComponent::EndMantle()
+{
+	SetMovementMode(MOVE_Walking);
+}
+
+bool UPXBaseCharacterMovementComponent::IsMantling() const
+{
+	return UpdatedComponent && MovementMode == MOVE_Custom && CustomMovementMode == static_cast<uint8>(ECustomMovementMode::CMOVE_Mantling);
+}
+
+void UPXBaseCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
+{
+	switch (CustomMovementMode)
+	{
+	case static_cast<uint8>(ECustomMovementMode::CMOVE_Mantling):
+		{
+			float ProgressRatio = GetWorld()->GetTimerManager().GetTimerElapsed(MantlingTimer) / TargetMantlingTime;
+			FVector NewLocation = FMath::Lerp(InitialMantlingLocation, TargetLedge.Location, ProgressRatio);
+			FRotator NewRotation = FMath::Lerp(InitialMantlingRotation, TargetLedge.Rotation, ProgressRatio);
+
+			FVector Delta = NewLocation - GetActorLocation();
+
+			FHitResult HitResult;
+			SafeMoveUpdatedComponent(Delta, NewRotation, false, HitResult);
+
+			break;
+		}
+
+	default:
+		break;
+	}
+
+	Super::PhysCustom(deltaTime, Iterations);
+}
+
 void UPXBaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
@@ -45,5 +86,24 @@ void UPXBaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode Prev
 			DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight(),
 			true
 		);
+	}
+
+	if (MovementMode == MOVE_Custom)
+	{
+		switch (CustomMovementMode)
+		{
+		case static_cast<uint8>(ECustomMovementMode::CMOVE_Mantling):
+			{
+				InitialMantlingLocation = GetActorLocation();
+				InitialMantlingRotation = GetOwner()->GetActorRotation();
+				TargetMantlingTime = 0.25f;
+				GetWorld()->GetTimerManager().SetTimer(MantlingTimer, this, &UPXBaseCharacterMovementComponent::EndMantle, TargetMantlingTime, false);
+				break;
+			}
+
+
+		default:
+			break;
+		}
 	}
 }

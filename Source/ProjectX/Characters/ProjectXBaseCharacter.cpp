@@ -2,10 +2,9 @@
 
 
 #include "ProjectXBaseCharacter.h"
-
 #include "GameFramework/CharacterMovementComponent.h"
-#include "ProjectX/Components/LedgeDetectorComponent.h"
-#include "ProjectX/Components/MovementComponents/PXBaseCharacterMovementComponent.h"
+#include "../Components/LedgeDetectorComponent.h"
+#include "../Components/MovementComponents/PXBaseCharacterMovementComponent.h"
 
 AProjectXBaseCharacter::AProjectXBaseCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	ObjectInitializer.SetDefaultSubobjectClass<UPXBaseCharacterMovementComponent>(CharacterMovementComponentName))
@@ -13,6 +12,11 @@ AProjectXBaseCharacter::AProjectXBaseCharacter(const FObjectInitializer& ObjectI
 	PXBaseCharacterMovementComponent = StaticCast<UPXBaseCharacterMovementComponent*>(GetCharacterMovement());
 
 	LedgeDetectorComponent = CreateDefaultSubobject<ULedgeDetectorComponent>(TEXT("LedgeDetector"));
+}
+
+bool AProjectXBaseCharacter::CanJumpInternal_Implementation() const
+{
+	return Super::CanJumpInternal_Implementation() && !GetBaseCharacterMovementComponent()->IsMantling();
 }
 
 void AProjectXBaseCharacter::ChangeCrouchState()
@@ -55,7 +59,7 @@ void AProjectXBaseCharacter::Mantle()
 
 	if (LedgeDetectorComponent->DetectLedge(LedgeDescription))
 	{
-		//todo: activate mantling	
+		GetBaseCharacterMovementComponent()->StartMantle(LedgeDescription);
 	}
 }
 

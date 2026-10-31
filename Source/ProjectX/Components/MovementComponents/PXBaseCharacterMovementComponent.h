@@ -4,7 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "../../Components/LedgeDetectorComponent.h"
 #include "PXBaseCharacterMovementComponent.generated.h"
+
+UENUM(BlueprintType)
+enum class ECustomMovementMode : uint8
+{
+	CMOVE_None = 0 UMETA(DisplayName = "None"),
+	CMOVE_Mantling UMETA(DisplayName = "Mantling"),
+	CMOVE_Max UMETA(Hidden),
+};
 
 /**
  * 
@@ -22,7 +31,13 @@ public:
 	void StartSprint();
 	void StopSprint();
 
+	void StartMantle(const FLedgeDescription& LedgeDescription);
+	void EndMantle();
+	bool IsMantling() const;
+
 protected:
+	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
+
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character movement: sprint", meta = (ClampMin = 0.f, UIMin = 0.f))
@@ -36,4 +51,11 @@ protected:
 
 private:
 	bool bIsSprinting;
+
+	FLedgeDescription TargetLedge;
+	float TargetMantlingTime = 1.0f;
+	FVector InitialMantlingLocation;
+	FRotator InitialMantlingRotation;
+
+	FTimerHandle MantlingTimer;
 };

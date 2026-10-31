@@ -32,9 +32,7 @@ public:
 	{
 	};
 
-	// virtual void Jump() override
-	// {
-	// };
+	virtual bool CanJumpInternal_Implementation() const override;
 
 	virtual void ChangeCrouchState();
 
@@ -58,7 +56,7 @@ public:
 
 	virtual void Mantle();
 
-	FORCEINLINE UPXBaseCharacterMovementComponent* GetBaseCharacterMovementComponent() { return PXBaseCharacterMovementComponent; }
+	FORCEINLINE UPXBaseCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return PXBaseCharacterMovementComponent; }
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Character | Movement")
