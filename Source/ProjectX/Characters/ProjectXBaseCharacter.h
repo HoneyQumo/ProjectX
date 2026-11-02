@@ -18,6 +18,12 @@ struct FMantlingSettings
 	class UCurveVector* MantlingCurve;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(ClampMin = 0.f, UIMin = 0.f))
+	float AnimationCorrectionXY = 65.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(ClampMin = 0.f, UIMin = 0.f))
+	float AnimationCorrectionZ = 200.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(ClampMin = 0.f, UIMin = 0.f))
 	float MinHeight = 100.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(ClampMin = 0.f, UIMin = 0.f))

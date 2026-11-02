@@ -54,11 +54,17 @@ void UPXBaseCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterat
 		{
 			float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(MantlingTimer) + CurrentMantlingParameters.StartTime;
 
-			FVector MatnlingCurveValue = CurrentMantlingParameters.MantlingCurve->GetVectorValue(ElapsedTime);
+			FVector MantlingCurveValue = CurrentMantlingParameters.MantlingCurve->GetVectorValue(ElapsedTime);
 
-			float PositionAlpha = MatnlingCurveValue.X;
+			float PositionAlpha = MantlingCurveValue.X;
+			float XYCorrectionAlpha = MantlingCurveValue.Y;
+			float ZCorrectionAlpha = MantlingCurveValue.Z;
 
-			FVector NewLocation = FMath::Lerp(CurrentMantlingParameters.InitialLocation, CurrentMantlingParameters.TargetLocation, PositionAlpha);
+			FVector CorrectedInitialLocation = FMath::Lerp(CurrentMantlingParameters.InitialLocation, CurrentMantlingParameters.InitialAnimationLocation,
+			                                               XYCorrectionAlpha);
+			CorrectedInitialLocation.Z = FMath::Lerp(CurrentMantlingParameters.InitialLocation.Z, CurrentMantlingParameters.InitialAnimationLocation.Z, ZCorrectionAlpha);
+
+			FVector NewLocation = FMath::Lerp(CorrectedInitialLocation, CurrentMantlingParameters.TargetLocation, PositionAlpha);
 			FRotator NewRotation = FMath::Lerp(CurrentMantlingParameters.InitialRotation, CurrentMantlingParameters.TargetRotation, PositionAlpha);
 
 			FVector Delta = NewLocation - GetActorLocation();

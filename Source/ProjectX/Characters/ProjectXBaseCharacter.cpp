@@ -79,6 +79,11 @@ void AProjectXBaseCharacter::Mantle()
 		FVector2D TargetRange(HeightMantleSettings.MinHeightStartTime, HeightMantleSettings.MaxHeightStartTime);
 		MantlingParameters.StartTime = FMath::GetMappedRangeValueClamped(SourceRange, TargetRange, MantlingHeight);
 
+		MantlingParameters.InitialAnimationLocation =
+			MantlingParameters.TargetLocation - HeightMantleSettings.AnimationCorrectionZ
+			* FVector::UpVector + HeightMantleSettings.AnimationCorrectionXY
+			* LedgeDescription.LedgeNormal;
+
 		GetBaseCharacterMovementComponent()->StartMantle(MantlingParameters);
 
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
