@@ -7,6 +7,20 @@
 #include "../../Components/LedgeDetectorComponent.h"
 #include "PXBaseCharacterMovementComponent.generated.h"
 
+struct FMantlingMovementParameters
+{
+	FVector InitialLocation = FVector::ZeroVector;
+	FRotator InitialRotation = FRotator::ZeroRotator;
+
+	FVector TargetLocation = FVector::ZeroVector;
+	FRotator TargetRotation = FRotator::ZeroRotator;
+
+	float Duration = 1.f;
+	float StartTime = 0.f;
+
+	UCurveVector* MantlingCurve;
+};
+
 UENUM(BlueprintType)
 enum class ECustomMovementMode : uint8
 {
@@ -31,7 +45,7 @@ public:
 	void StartSprint();
 	void StopSprint();
 
-	void StartMantle(const FLedgeDescription& LedgeDescription);
+	void StartMantle(const FMantlingMovementParameters& MantlingParameters);
 	void EndMantle();
 	bool IsMantling() const;
 
@@ -52,10 +66,7 @@ protected:
 private:
 	bool bIsSprinting;
 
-	FLedgeDescription TargetLedge;
-	float TargetMantlingTime = 1.0f;
-	FVector InitialMantlingLocation;
-	FRotator InitialMantlingRotation;
+	FMantlingMovementParameters CurrentMantlingParameters;
 
 	FTimerHandle MantlingTimer;
 };

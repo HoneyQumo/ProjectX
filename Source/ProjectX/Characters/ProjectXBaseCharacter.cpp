@@ -5,6 +5,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../Components/LedgeDetectorComponent.h"
 #include "../Components/MovementComponents/PXBaseCharacterMovementComponent.h"
+#include "Curves/CurveVector.h"
 
 AProjectXBaseCharacter::AProjectXBaseCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	ObjectInitializer.SetDefaultSubobjectClass<UPXBaseCharacterMovementComponent>(CharacterMovementComponentName))
@@ -59,8 +60,29 @@ void AProjectXBaseCharacter::Mantle()
 
 	if (LedgeDetectorComponent->DetectLedge(LedgeDescription))
 	{
-		GetBaseCharacterMovementComponent()->StartMantle(LedgeDescription);
-		PlayAnimMontage(HighMantleMontage);
+		FMantlingMovementParameters MantlingParameters;
+		MantlingParameters.MantlingCurve = HeightMantleSettings.MantlingCurve;
+		MantlingParameters.InitialLocation = GetActorLocation();
+		MantlingParameters.InitialRotation = GetActorRotation();
+		MantlingParameters.TargetLocation = LedgeDescription.Location;
+		MantlingParameters.TargetRotation = LedgeDescription.Rotation;
+
+		float MinRange;
+		float MaxRange;
+		HeightMantleSettings.MantlingCurve->GetTimeRange(MinRange, MaxRange);
+		MantlingParameters.Duration = MaxRange - MinRange;
+
+		float MantlingHeight = (MantlingParameters.TargetLocation - MantlingParameters.InitialLocation).Z;
+
+		// float StartTime = HeightMantleSettings.MaxHeightStartTime - (MantlingHeight - HeightMantleSettings.MinHeight) / (HeightMantleSettings.MaxHeight - HeightMantleSettings.MinHeight) * (HeightMantleSettings.MaxHeightStartTime - HeightMantleSettings.MinHeightStartTime);
+		FVector2D SourceRange(HeightMantleSettings.MinHeight, HeightMantleSettings.MaxHeight);
+		FVector2D TargetRange(HeightMantleSettings.MinHeightStartTime, HeightMantleSettings.MaxHeightStartTime);
+		MantlingParameters.StartTime = FMath::GetMappedRangeValueClamped(SourceRange, TargetRange, MantlingHeight);
+
+		GetBaseCharacterMovementComponent()->StartMantle(MantlingParameters);
+
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(HeightMantleSettings.MantlingMontage, 1.f, EMontagePlayReturnType::Duration, MantlingParameters.StartTime);
 	}
 }
 

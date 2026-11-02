@@ -3,6 +3,7 @@
 
 #include "PXBaseCharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Curves/CurveVector.h"
 #include "GameFramework/Character.h"
 
 float UPXBaseCharacterMovementComponent::GetMaxSpeed() const
@@ -29,9 +30,9 @@ void UPXBaseCharacterMovementComponent::StopSprint()
 	bForceMaxAccel = 0;
 }
 
-void UPXBaseCharacterMovementComponent::StartMantle(const FLedgeDescription& LedgeDescription)
+void UPXBaseCharacterMovementComponent::StartMantle(const FMantlingMovementParameters& MantlingParameters)
 {
-	TargetLedge = LedgeDescription;
+	CurrentMantlingParameters = MantlingParameters;
 	SetMovementMode(MOVE_Custom, static_cast<uint8>(ECustomMovementMode::CMOVE_Mantling));
 }
 
@@ -51,9 +52,14 @@ void UPXBaseCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterat
 	{
 	case static_cast<uint8>(ECustomMovementMode::CMOVE_Mantling):
 		{
-			float ProgressRatio = GetWorld()->GetTimerManager().GetTimerElapsed(MantlingTimer) / TargetMantlingTime;
-			FVector NewLocation = FMath::Lerp(InitialMantlingLocation, TargetLedge.Location, ProgressRatio);
-			FRotator NewRotation = FMath::Lerp(InitialMantlingRotation, TargetLedge.Rotation, ProgressRatio);
+			float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(MantlingTimer) + CurrentMantlingParameters.StartTime;
+
+			FVector MatnlingCurveValue = CurrentMantlingParameters.MantlingCurve->GetVectorValue(ElapsedTime);
+
+			float PositionAlpha = MatnlingCurveValue.X;
+
+			FVector NewLocation = FMath::Lerp(CurrentMantlingParameters.InitialLocation, CurrentMantlingParameters.TargetLocation, PositionAlpha);
+			FRotator NewRotation = FMath::Lerp(CurrentMantlingParameters.InitialRotation, CurrentMantlingParameters.TargetRotation, PositionAlpha);
 
 			FVector Delta = NewLocation - GetActorLocation();
 
@@ -94,10 +100,7 @@ void UPXBaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode Prev
 		{
 		case static_cast<uint8>(ECustomMovementMode::CMOVE_Mantling):
 			{
-				InitialMantlingLocation = GetActorLocation();
-				InitialMantlingRotation = GetOwner()->GetActorRotation();
-				TargetMantlingTime = 0.25f;
-				GetWorld()->GetTimerManager().SetTimer(MantlingTimer, this, &UPXBaseCharacterMovementComponent::EndMantle, TargetMantlingTime, false);
+				GetWorld()->GetTimerManager().SetTimer(MantlingTimer, this, &UPXBaseCharacterMovementComponent::EndMantle, CurrentMantlingParameters.Duration, false);
 				break;
 			}
 
