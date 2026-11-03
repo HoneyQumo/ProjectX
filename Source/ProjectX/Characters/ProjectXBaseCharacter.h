@@ -108,10 +108,18 @@ protected:
 	class ULedgeDetectorComponent* LedgeDetectorComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character | Movement | Mantling")
-	FMantlingSettings HeightMantleSettings;
+	FMantlingSettings HighMantleSettings;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character | Movement | Mantling")
+	FMantlingSettings LowMantleSettings;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character | Movement | Mantling", meta = (ClampMin = 0.f, UIMin = 0.f))
+	float LowMantleMaxHeight = 125.f;
 
 private:
 	void TryChangeSprintState();
 
 	bool bIsSprintRequested = false;
+
+	const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
 };
