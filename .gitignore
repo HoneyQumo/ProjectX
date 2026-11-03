@@ -12,3 +12,13 @@ Saved
 *.suo
 *.xcodeproj
 *.xcworkspace
+.idea
+
+# В Source только код и скрипты сборки
+/Source/**
+!/Source/**/
+!/Source/**/*.h
+!/Source/**/*.hpp
+!/Source/**/*.inl
+!/Source/**/*.cpp
+!/Source/**/*.cs
