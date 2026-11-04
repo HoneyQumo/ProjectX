@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "ProjectXBaseCharacter.generated.h"
 
+class AInteractiveActor;
+
 USTRUCT(BlueprintType)
 struct FMantlingSettings
 {
@@ -88,6 +90,9 @@ public:
 
 	FORCEINLINE UPXBaseCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return PXBaseCharacterMovementComponent; }
 
+	void RegisterInteractiveActor(AInteractiveActor* InteractiveActor);
+	void UnregisterInteractiveActor(AInteractiveActor* InteractiveActor);
+
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Character | Movement")
 	void OnSprintStart();
@@ -122,4 +127,6 @@ private:
 	bool bIsSprintRequested = false;
 
 	const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
+
+	TArray<AInteractiveActor*> AvailableInteractiveActors;
 };

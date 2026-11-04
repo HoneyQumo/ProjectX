@@ -94,6 +94,16 @@ void AProjectXBaseCharacter::Mantle()
 	}
 }
 
+void AProjectXBaseCharacter::RegisterInteractiveActor(AInteractiveActor* InteractiveActor)
+{
+	AvailableInteractiveActors.Add(InteractiveActor);
+}
+
+void AProjectXBaseCharacter::UnregisterInteractiveActor(AInteractiveActor* InteractiveActor)
+{
+	AvailableInteractiveActors.Remove(InteractiveActor);
+}
+
 void AProjectXBaseCharacter::OnSprintStart_Implementation()
 {
 }
