@@ -24,7 +24,7 @@ void AProjectXPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("SwimUp", this, &AProjectXPlayerController::SwimUp);
 	InputComponent->BindAxis("ClimbLadderUp", this, &AProjectXPlayerController::ClimbLadderUp);
 	InputComponent->BindAction("Crouch", IE_Pressed, this, &AProjectXPlayerController::ChangeCrouchState);
-	InputComponent->BindAction("InteractWithLadder", IE_Released, this, &AProjectXPlayerController::InteractWithLadder);
+	InputComponent->BindAction("InteractWithLadder", IE_Pressed, this, &AProjectXPlayerController::InteractWithLadder);
 	InputComponent->BindAction("Mantle", IE_Pressed, this, &AProjectXPlayerController::Mantle);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AProjectXPlayerController::Jump);
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AProjectXPlayerController::StartSprint);

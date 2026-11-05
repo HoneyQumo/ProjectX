@@ -123,7 +123,7 @@ void AProjectXBaseCharacter::Mantle()
 
 void AProjectXBaseCharacter::RegisterInteractiveActor(AInteractiveActor* InteractiveActor)
 {
-	AvailableInteractiveActors.Add(InteractiveActor);
+	AvailableInteractiveActors.AddUnique(InteractiveActor);
 }
 
 void AProjectXBaseCharacter::UnregisterInteractiveActor(AInteractiveActor* InteractiveActor)
@@ -142,7 +142,7 @@ const ALadder* AProjectXBaseCharacter::GetAvailableLadder() const
 			break;
 		}
 	}
-	
+
 	return Result;
 }
 

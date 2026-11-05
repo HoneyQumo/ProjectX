@@ -65,7 +65,7 @@ void ALadder::OnConstruction(const FTransform& Transform)
 	uint32 StepsCount = FMath::FloorToInt((LadderHeight - BottomStepOffset) / StepsInterval);
 	for (uint32 i = 0; i < StepsCount; ++i)
 	{
-		FTransform InstanceTransform(FVector(1.f, 1.f, BottomStepOffset + i * StepsInterval));
+		FTransform InstanceTransform(FVector(0.f, 0.f, BottomStepOffset + i * StepsInterval));
 		StepsMeshComponent->AddInstance(InstanceTransform);
 	}
 

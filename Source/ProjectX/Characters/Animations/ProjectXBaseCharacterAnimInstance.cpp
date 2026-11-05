@@ -29,4 +29,9 @@ void UProjectXBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSecond
 	bIsCrouching = CharacterMovementComponent->IsCrouching();
 	bIsSprinting = CharacterMovementComponent->IsSprinting();
 	bIsSwimming = CharacterMovementComponent->IsSwimming();
+	bIsOnLadder = CharacterMovementComponent->IsOnLadder();
+	if (bIsOnLadder)
+	{
+		LadderSpeedRatio = CharacterMovementComponent->GetLadderSpeedRatio();
+	}
 }

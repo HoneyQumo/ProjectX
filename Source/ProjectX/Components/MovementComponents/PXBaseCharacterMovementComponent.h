@@ -54,8 +54,9 @@ public:
 	void StartMantle(const FMantlingMovementParameters& MantlingParameters);
 	void EndMantle();
 	bool IsMantling() const;
-	float GetActorToCurrentLadderProjection(const FVector& Location);
+	float GetActorToCurrentLadderProjection(const FVector& Location) const;
 
+	float GetLadderSpeedRatio() const;
 
 	void AttachToLadder(const ALadder* Ladder);
 	void DetachFromLadder();
@@ -94,7 +95,7 @@ protected:
 	float MinLadderBottomOffset = 90.f;
 
 	const ALadder* CurrentLadder = nullptr;
-	
+
 	class AProjectXBaseCharacter* GetBaseCharacterOwner() const;
 
 private:

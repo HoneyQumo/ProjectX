@@ -34,6 +34,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character animation")
 	bool bIsSwimming = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character animation")
+	bool bIsOnLadder = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character animation")
+	float LadderSpeedRatio = 0.f;
+
 private:
 	TWeakObjectPtr<class AProjectXBaseCharacter> CachedBaseCharacter;
 };

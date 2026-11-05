@@ -62,13 +62,21 @@ bool UPXBaseCharacterMovementComponent::IsMantling() const
 	return UpdatedComponent && MovementMode == MOVE_Custom && CustomMovementMode == static_cast<uint8>(ECustomMovementMode::CMOVE_Mantling);
 }
 
-float UPXBaseCharacterMovementComponent::GetActorToCurrentLadderProjection(const FVector& Location)
+float UPXBaseCharacterMovementComponent::GetActorToCurrentLadderProjection(const FVector& Location) const
 {
 	checkf(IsValid(CurrentLadder), TEXT("UPXBaseCharacterMovementComponent::GetActorToCurrentLadderProjection() can't ba invoked when current ladder is null"))
 
 	FVector LadderUpVector = CurrentLadder->GetActorUpVector();
 	FVector LadderToCharacterDistance = Location - CurrentLadder->GetActorLocation();
 	return FVector::DotProduct(LadderUpVector, LadderToCharacterDistance);
+}
+
+float UPXBaseCharacterMovementComponent::GetLadderSpeedRatio() const
+{
+	checkf(IsValid(CurrentLadder), TEXT("UPXBaseCharacterMovementComponent::GetLadderSpeedRatio() can't ba invoked when current ladder is null"))
+
+	FVector LadderUpVector = CurrentLadder->GetActorUpVector();
+	return FVector::DotProduct(LadderUpVector, Velocity) / ClimbingOnLadderMaxSpeed;
 }
 
 void UPXBaseCharacterMovementComponent::AttachToLadder(const ALadder* Ladder)

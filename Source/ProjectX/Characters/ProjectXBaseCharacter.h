@@ -133,5 +133,6 @@ private:
 
 	const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
 
+	UPROPERTY()
 	TArray<AInteractiveActor*> AvailableInteractiveActors;
 };
