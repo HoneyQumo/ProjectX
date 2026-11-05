@@ -7,6 +7,8 @@
 #include "../../Components/LedgeDetectorComponent.h"
 #include "PXBaseCharacterMovementComponent.generated.h"
 
+class ALadder;
+
 struct FMantlingMovementParameters
 {
 	FVector InitialLocation = FVector::ZeroVector;
@@ -28,6 +30,7 @@ enum class ECustomMovementMode : uint8
 {
 	CMOVE_None = 0 UMETA(DisplayName = "None"),
 	CMOVE_Mantling UMETA(DisplayName = "Mantling"),
+	CMOVE_Ladder UMETA(DisplayName = "Ladder"),
 	CMOVE_Max UMETA(Hidden),
 };
 
@@ -51,7 +54,15 @@ public:
 	void EndMantle();
 	bool IsMantling() const;
 
+
+	void AttachToLadder(const ALadder* Ladder);
+	void DetachFromLadder();
+	bool IsOnLadder() const;
+	const ALadder* GetCurrentLadder() const;
+
 protected:
+	void PhysMantling(float deltaTime, int32 Iterations);
+	void PhysLadder(float deltaTime, int32 Iterations);
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
 
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
@@ -64,6 +75,14 @@ protected:
 
 	UPROPERTY(Category="Character Movement: Swimming", EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0", UIMin="0", ForceUnits="cm/s"))
 	float SwimmingCapsuleHalfHeight = 60.f;
+
+	UPROPERTY(Category="Character Movement: Ladder", EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0", UIMin="0", ForceUnits="cm/s"))
+	float ClimbingOnLadderMaxSpeed = 200.f;
+
+	UPROPERTY(Category="Character Movement: Ladder", EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0", UIMin="0", ForceUnits="cm/s"))
+	float ClimbingOnLadderBrakingDeceleration = 2048.f;
+
+	const ALadder* CurrentLadder = nullptr;
 
 private:
 	bool bIsSprinting;

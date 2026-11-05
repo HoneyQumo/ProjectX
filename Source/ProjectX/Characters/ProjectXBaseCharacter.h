@@ -50,11 +50,11 @@ public:
 
 	virtual void MoveForward(float Value)
 	{
-	};
+	}
 
 	virtual void MoveRight(float Value)
 	{
-	};
+	}
 
 	virtual void Turn(float Value)
 	{
@@ -83,6 +83,9 @@ public:
 	{
 	};
 
+	virtual void ClimbLadderUp(float Value);
+
+	virtual void InteractWithLadder();
 
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -92,6 +95,8 @@ public:
 
 	void RegisterInteractiveActor(AInteractiveActor* InteractiveActor);
 	void UnregisterInteractiveActor(AInteractiveActor* InteractiveActor);
+
+	const class ALadder* GetAvailableLadder() const;
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Character | Movement")

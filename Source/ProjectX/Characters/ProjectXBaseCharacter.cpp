@@ -3,9 +3,11 @@
 
 #include "ProjectXBaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Curves/CurveVector.h"
+#include "ProjectX/Actors/Interactive/InteractiveActor.h"
+#include "ProjectX/Actors/Interactive/Environment/Ladder.h"
 #include "../Components/LedgeDetectorComponent.h"
 #include "../Components/MovementComponents/PXBaseCharacterMovementComponent.h"
-#include "Curves/CurveVector.h"
 
 AProjectXBaseCharacter::AProjectXBaseCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	ObjectInitializer.SetDefaultSubobjectClass<UPXBaseCharacterMovementComponent>(CharacterMovementComponentName))
@@ -45,6 +47,31 @@ void AProjectXBaseCharacter::StartSprint()
 void AProjectXBaseCharacter::StopSprint()
 {
 	bIsSprintRequested = false;
+}
+
+void AProjectXBaseCharacter::ClimbLadderUp(float Value)
+{
+	if (GetBaseCharacterMovementComponent()->IsOnLadder() && !FMath::IsNearlyZero(Value))
+	{
+		FVector LadderUpVector = GetBaseCharacterMovementComponent()->GetCurrentLadder()->GetActorUpVector();
+		AddMovementInput(LadderUpVector, Value);
+	}
+}
+
+void AProjectXBaseCharacter::InteractWithLadder()
+{
+	if (GetBaseCharacterMovementComponent()->IsOnLadder())
+	{
+		GetBaseCharacterMovementComponent()->DetachFromLadder();
+	}
+	else
+	{
+		const ALadder* AvailableLadder = GetAvailableLadder();
+		if (IsValid(AvailableLadder))
+		{
+			GetBaseCharacterMovementComponent()->AttachToLadder(AvailableLadder);
+		}
+	}
 }
 
 void AProjectXBaseCharacter::Tick(float DeltaSeconds)
@@ -102,6 +129,21 @@ void AProjectXBaseCharacter::RegisterInteractiveActor(AInteractiveActor* Interac
 void AProjectXBaseCharacter::UnregisterInteractiveActor(AInteractiveActor* InteractiveActor)
 {
 	AvailableInteractiveActors.Remove(InteractiveActor);
+}
+
+const ALadder* AProjectXBaseCharacter::GetAvailableLadder() const
+{
+	const ALadder* Result = nullptr;
+	for (const AInteractiveActor* InteractiveActor : AvailableInteractiveActors)
+	{
+		if (InteractiveActor->IsA<ALadder>())
+		{
+			Result = StaticCast<const ALadder*>(InteractiveActor);
+			break;
+		}
+	}
+	
+	return Result;
 }
 
 void AProjectXBaseCharacter::OnSprintStart_Implementation()

@@ -22,7 +22,9 @@ void AProjectXPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("SwimForward", this, &AProjectXPlayerController::SwimForward);
 	InputComponent->BindAxis("SwimRight", this, &AProjectXPlayerController::SwimRight);
 	InputComponent->BindAxis("SwimUp", this, &AProjectXPlayerController::SwimUp);
+	InputComponent->BindAxis("ClimbLadderUp", this, &AProjectXPlayerController::ClimbLadderUp);
 	InputComponent->BindAction("Crouch", IE_Pressed, this, &AProjectXPlayerController::ChangeCrouchState);
+	InputComponent->BindAction("InteractWithLadder", IE_Released, this, &AProjectXPlayerController::InteractWithLadder);
 	InputComponent->BindAction("Mantle", IE_Pressed, this, &AProjectXPlayerController::Mantle);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AProjectXPlayerController::Jump);
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AProjectXPlayerController::StartSprint);
@@ -122,5 +124,21 @@ void AProjectXPlayerController::SwimUp(float Value)
 	if (CachedBaseCharacter.IsValid())
 	{
 		CachedBaseCharacter->SwimUp(Value);
+	}
+}
+
+void AProjectXPlayerController::ClimbLadderUp(float Value)
+{
+	if (CachedBaseCharacter.IsValid())
+	{
+		CachedBaseCharacter->ClimbLadderUp(Value);
+	}
+}
+
+void AProjectXPlayerController::InteractWithLadder()
+{
+	if (CachedBaseCharacter.IsValid())
+	{
+		CachedBaseCharacter->InteractWithLadder();
 	}
 }

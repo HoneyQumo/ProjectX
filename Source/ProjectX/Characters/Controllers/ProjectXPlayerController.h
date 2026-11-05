@@ -36,5 +36,8 @@ private:
 	void SwimRight(float Value);
 	void SwimUp(float Value);
 
+	void ClimbLadderUp(float Value);
+	void InteractWithLadder();
+
 	TSoftObjectPtr<class AProjectXBaseCharacter> CachedBaseCharacter;
 };
