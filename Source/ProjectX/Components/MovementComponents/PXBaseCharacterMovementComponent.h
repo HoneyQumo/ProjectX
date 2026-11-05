@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "../../Components/LedgeDetectorComponent.h"
 #include "PXBaseCharacterMovementComponent.generated.h"
 
 class ALadder;
@@ -43,6 +42,8 @@ class PROJECTX_API UPXBaseCharacterMovementComponent : public UCharacterMovement
 	GENERATED_BODY()
 
 public:
+	virtual void PhysicsRotation(float DeltaTime) override;
+
 	FORCEINLINE bool IsSprinting() { return bIsSprinting; }
 
 	virtual float GetMaxSpeed() const override;
@@ -53,6 +54,7 @@ public:
 	void StartMantle(const FMantlingMovementParameters& MantlingParameters);
 	void EndMantle();
 	bool IsMantling() const;
+	float GetActorToCurrentLadderProjection(const FVector& Location);
 
 
 	void AttachToLadder(const ALadder* Ladder);
@@ -82,7 +84,18 @@ protected:
 	UPROPERTY(Category="Character Movement: Ladder", EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0", UIMin="0", ForceUnits="cm/s"))
 	float ClimbingOnLadderBrakingDeceleration = 2048.f;
 
+	UPROPERTY(Category="Character Movement: Ladder", EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0", UIMin="0", ForceUnits="cm/s"))
+	float LadderToCharacterOffset = 60.f;
+
+	UPROPERTY(Category="Character Movement: Ladder", EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0", UIMin="0", ForceUnits="cm/s"))
+	float MaxLadderTopOffset = 90.f;
+
+	UPROPERTY(Category="Character Movement: Ladder", EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0", UIMin="0", ForceUnits="cm/s"))
+	float MinLadderBottomOffset = 90.f;
+
 	const ALadder* CurrentLadder = nullptr;
+	
+	class AProjectXBaseCharacter* GetBaseCharacterOwner() const;
 
 private:
 	bool bIsSprinting;

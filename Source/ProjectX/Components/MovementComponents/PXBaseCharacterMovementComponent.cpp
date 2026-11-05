@@ -5,6 +5,18 @@
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "GameFramework/Character.h"
+#include "../../Actors/Interactive/Environment/Ladder.h"
+#include "../../Characters/ProjectXBaseCharacter.h"
+
+void UPXBaseCharacterMovementComponent::PhysicsRotation(float DeltaTime)
+{
+	if (IsOnLadder())
+	{
+		return;
+	}
+
+	Super::PhysicsRotation(DeltaTime);
+}
 
 float UPXBaseCharacterMovementComponent::GetMaxSpeed() const
 {
@@ -50,9 +62,31 @@ bool UPXBaseCharacterMovementComponent::IsMantling() const
 	return UpdatedComponent && MovementMode == MOVE_Custom && CustomMovementMode == static_cast<uint8>(ECustomMovementMode::CMOVE_Mantling);
 }
 
-void UPXBaseCharacterMovementComponent::AttachToLadder(const class ALadder* Ladder)
+float UPXBaseCharacterMovementComponent::GetActorToCurrentLadderProjection(const FVector& Location)
+{
+	checkf(IsValid(CurrentLadder), TEXT("UPXBaseCharacterMovementComponent::GetActorToCurrentLadderProjection() can't ba invoked when current ladder is null"))
+
+	FVector LadderUpVector = CurrentLadder->GetActorUpVector();
+	FVector LadderToCharacterDistance = Location - CurrentLadder->GetActorLocation();
+	return FVector::DotProduct(LadderUpVector, LadderToCharacterDistance);
+}
+
+void UPXBaseCharacterMovementComponent::AttachToLadder(const ALadder* Ladder)
 {
 	CurrentLadder = Ladder;
+
+	FRotator TargetOrientationRotation = CurrentLadder->GetActorForwardVector().ToOrientationRotator();
+	TargetOrientationRotation.Yaw += 180.f;
+
+	FVector LadderUpVector = CurrentLadder->GetActorUpVector();
+	FVector LadderForwardVector = CurrentLadder->GetActorForwardVector();
+	float Projection = GetActorToCurrentLadderProjection(GetActorLocation());
+
+	FVector NewCharacterLocation = CurrentLadder->GetActorLocation() + Projection * LadderUpVector + LadderToCharacterOffset * LadderForwardVector;
+
+	GetOwner()->SetActorLocation(NewCharacterLocation);
+	GetOwner()->SetActorRotation(TargetOrientationRotation);
+
 	SetMovementMode(MOVE_Custom, static_cast<uint8>(ECustomMovementMode::CMOVE_Ladder));
 }
 
@@ -98,6 +132,20 @@ void UPXBaseCharacterMovementComponent::PhysLadder(float deltaTime, int32 Iterat
 {
 	CalcVelocity(deltaTime, 1.f, false, ClimbingOnLadderBrakingDeceleration);
 	FVector Delta = Velocity * deltaTime;
+
+	FVector NewPos = GetActorLocation() + Delta;
+	float NewPosProjection = GetActorToCurrentLadderProjection(NewPos);
+
+	if (NewPosProjection < MinLadderBottomOffset)
+	{
+		DetachFromLadder();
+		return;
+	}
+	if (NewPosProjection > (CurrentLadder->GetLadderHeight() - MaxLadderTopOffset))
+	{
+		GetBaseCharacterOwner()->Mantle();
+		return;
+	}
 
 	FHitResult HitResult;
 	SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, HitResult);
@@ -161,4 +209,9 @@ void UPXBaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode Prev
 			break;
 		}
 	}
+}
+
+AProjectXBaseCharacter* UPXBaseCharacterMovementComponent::GetBaseCharacterOwner() const
+{
+	return StaticCast<AProjectXBaseCharacter*>(CharacterOwner);
 }
