@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ProjectX/Characters/ProjectXBaseCharacter.h"
 #include "InteractiveActor.generated.h"
 
 UCLASS(Abstract, NotBlueprintable)
@@ -21,4 +22,6 @@ protected:
 
 	UFUNCTION()
 	virtual void OnInteractionVolumeOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	bool IsOverlappingCharacterCapsule(AActor* OtherActor, UPrimitiveComponent* OtherComp);
 };

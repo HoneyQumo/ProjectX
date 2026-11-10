@@ -128,7 +128,7 @@ void AProjectXBaseCharacter::RegisterInteractiveActor(AInteractiveActor* Interac
 
 void AProjectXBaseCharacter::UnregisterInteractiveActor(AInteractiveActor* InteractiveActor)
 {
-	AvailableInteractiveActors.Remove(InteractiveActor);
+	AvailableInteractiveActors.RemoveSingleSwap(InteractiveActor);
 }
 
 const ALadder* AProjectXBaseCharacter::GetAvailableLadder() const

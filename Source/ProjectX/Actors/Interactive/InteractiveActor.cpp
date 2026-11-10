@@ -20,33 +20,38 @@ void AInteractiveActor::BeginPlay()
 void AInteractiveActor::OnInteractionVolumeOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                                                         int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AProjectXBaseCharacter* BaseCharacter = Cast<AProjectXBaseCharacter>(OtherActor);
-	if (!IsValid(BaseCharacter))
+	if (!IsOverlappingCharacterCapsule(OtherActor, OtherComp))
 	{
 		return;
 	}
 
-	if (Cast<UCapsuleComponent>(OtherComp) != BaseCharacter->GetCapsuleComponent())
-	{
-		return;
-	}
-
-
+	AProjectXBaseCharacter* BaseCharacter = StaticCast<AProjectXBaseCharacter*>(OtherActor);
 	BaseCharacter->RegisterInteractiveActor(this);
 }
 
 void AInteractiveActor::OnInteractionVolumeOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (!IsOverlappingCharacterCapsule(OtherActor, OtherComp))
+	{
+		return;
+	}
+
+	AProjectXBaseCharacter* BaseCharacter = StaticCast<AProjectXBaseCharacter*>(OtherActor);
+	BaseCharacter->UnregisterInteractiveActor(this);
+}
+
+bool AInteractiveActor::IsOverlappingCharacterCapsule(AActor* OtherActor, UPrimitiveComponent* OtherComp)
+{
 	AProjectXBaseCharacter* BaseCharacter = Cast<AProjectXBaseCharacter>(OtherActor);
 	if (!IsValid(BaseCharacter))
 	{
-		return;
+		return false;
 	}
 
 	if (Cast<UCapsuleComponent>(OtherComp) != BaseCharacter->GetCapsuleComponent())
 	{
-		return;
+		return false;
 	}
 
-	BaseCharacter->UnregisterInteractiveActor(this);
+	return true;
 }
