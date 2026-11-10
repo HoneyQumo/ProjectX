@@ -101,6 +101,20 @@ bool ALadder::GetIsOnTop() const
 	return bIsOnTop;
 }
 
+UAnimMontage* ALadder::GetAttachFromTopAnimMontage() const
+{
+	return AttachFromTopAnimMontage;
+}
+
+FVector ALadder::GetAttachFromTopAnimMontageStartingLocation() const
+{
+	FRotator OrientationRotation = GetActorForwardVector().ToOrientationRotator();
+	FVector Offset = OrientationRotation.RotateVector(AttachFromTopAnimMontageInitialOffset);
+
+	FVector LadderTop = GetActorLocation() + GetActorUpVector() * LadderHeight;
+	return LadderTop + Offset;
+}
+
 UBoxComponent* ALadder::GetLadderInteractionBox() const
 {
 	return StaticCast<UBoxComponent*>(InteractionVolume);

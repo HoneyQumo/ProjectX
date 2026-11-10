@@ -91,6 +91,10 @@ void UPXBaseCharacterMovementComponent::AttachToLadder(const ALadder* Ladder)
 	float Projection = GetActorToCurrentLadderProjection(GetActorLocation());
 
 	FVector NewCharacterLocation = CurrentLadder->GetActorLocation() + Projection * LadderUpVector + LadderToCharacterOffset * LadderForwardVector;
+	if (CurrentLadder->GetIsOnTop())
+	{
+		NewCharacterLocation = CurrentLadder->GetAttachFromTopAnimMontageStartingLocation();
+	}
 
 	GetOwner()->SetActorLocation(NewCharacterLocation);
 	GetOwner()->SetActorRotation(TargetOrientationRotation);
@@ -141,6 +145,13 @@ void UPXBaseCharacterMovementComponent::PhysLadder(float deltaTime, int32 Iterat
 	CalcVelocity(deltaTime, 1.f, false, ClimbingOnLadderBrakingDeceleration);
 	FVector Delta = Velocity * deltaTime;
 
+	if (HasAnimRootMotion())
+	{
+		FHitResult HitResult;
+		SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), false, HitResult);
+		return;
+	}
+
 	FVector NewPos = GetActorLocation() + Delta;
 	float NewPosProjection = GetActorToCurrentLadderProjection(NewPos);
 
@@ -151,7 +162,7 @@ void UPXBaseCharacterMovementComponent::PhysLadder(float deltaTime, int32 Iterat
 	}
 	if (NewPosProjection > (CurrentLadder->GetLadderHeight() - MaxLadderTopOffset))
 	{
-		GetBaseCharacterOwner()->Mantle();
+		GetBaseCharacterOwner()->Mantle(true);
 		return;
 	}
 

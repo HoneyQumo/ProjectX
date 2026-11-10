@@ -5,6 +5,8 @@
 #include "Ladder.generated.h"
 
 class UStaticMeshComponent;
+class UBoxComponent;
+class UAnimMontage;
 
 UCLASS(Blueprintable)
 class PROJECTX_API ALadder : public AInteractiveActor
@@ -22,6 +24,10 @@ public:
 
 	bool GetIsOnTop() const;
 
+	UAnimMontage* GetAttachFromTopAnimMontage() const;
+
+	FVector GetAttachFromTopAnimMontageStartingLocation() const;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters")
 	float LadderHeight = 100.f;
@@ -36,7 +42,14 @@ protected:
 	float BottomStepOffset = 25.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters")
-	class UBoxComponent* TopInteractionVolume;
+	UBoxComponent* TopInteractionVolume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters")
+	UAnimMontage* AttachFromTopAnimMontage;
+
+	//offset from ladder's top from anim montage
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters")
+	FVector AttachFromTopAnimMontageInitialOffset = FVector::ZeroVector;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* LeftRailMeshComponent;
@@ -47,7 +60,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UInstancedStaticMeshComponent* StepsMeshComponent;
 
-	class UBoxComponent* GetLadderInteractionBox() const;
+	UBoxComponent* GetLadderInteractionBox() const;
 
 	virtual void OnInteractionVolumeOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	                                             bool bFromSweep, const FHitResult& SweepResult) override;

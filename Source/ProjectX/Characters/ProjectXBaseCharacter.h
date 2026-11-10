@@ -89,7 +89,7 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	virtual void Mantle();
+	virtual void Mantle(bool bForce = false);
 
 	FORCEINLINE UPXBaseCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return PXBaseCharacterMovementComponent; }
 
@@ -111,6 +111,8 @@ protected:
 	float SprintSpeed = 800.f;
 
 	virtual bool CanSprint();
+
+	bool CanMantle() const;
 
 	UPXBaseCharacterMovementComponent* PXBaseCharacterMovementComponent;
 

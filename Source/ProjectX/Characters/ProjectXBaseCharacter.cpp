@@ -69,6 +69,10 @@ void AProjectXBaseCharacter::InteractWithLadder()
 		const ALadder* AvailableLadder = GetAvailableLadder();
 		if (IsValid(AvailableLadder))
 		{
+			if (AvailableLadder->GetIsOnTop())
+			{
+				PlayAnimMontage(AvailableLadder->GetAttachFromTopAnimMontage());
+			}
 			GetBaseCharacterMovementComponent()->AttachToLadder(AvailableLadder);
 		}
 	}
@@ -81,8 +85,13 @@ void AProjectXBaseCharacter::Tick(float DeltaSeconds)
 	TryChangeSprintState();
 }
 
-void AProjectXBaseCharacter::Mantle()
+void AProjectXBaseCharacter::Mantle(bool bForce /*= false */)
 {
+	if (!(CanMantle() || bForce))
+	{
+		return;
+	}
+
 	FLedgeDescription LedgeDescription;
 
 	if (LedgeDetectorComponent->DetectLedge(LedgeDescription))
@@ -157,6 +166,11 @@ void AProjectXBaseCharacter::OnSprintEnd_Implementation()
 bool AProjectXBaseCharacter::CanSprint()
 {
 	return true;
+}
+
+bool AProjectXBaseCharacter::CanMantle() const
+{
+	return !GetBaseCharacterMovementComponent()->IsOnLadder();
 }
 
 void AProjectXBaseCharacter::TryChangeSprintState()
