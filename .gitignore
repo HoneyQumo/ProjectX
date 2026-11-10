@@ -13,6 +13,7 @@ Saved
 *.xcodeproj
 *.xcworkspace
 .idea
+*.DotSettings.user
 
 # В Source только код и скрипты сборки
 /Source/**

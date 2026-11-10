@@ -155,12 +155,12 @@ void UPXBaseCharacterMovementComponent::PhysLadder(float deltaTime, int32 Iterat
 	FVector NewPos = GetActorLocation() + Delta;
 	float NewPosProjection = GetActorToCurrentLadderProjection(NewPos);
 
-	if (NewPosProjection < MinLadderBottomOffset)
+	if (NewPosProjection < MinLadderBottomOffset && GetLadderSpeedRatio() < 0.f)
 	{
 		DetachFromLadder();
 		return;
 	}
-	if (NewPosProjection > (CurrentLadder->GetLadderHeight() - MaxLadderTopOffset))
+	if (NewPosProjection > (CurrentLadder->GetLadderHeight() - MaxLadderTopOffset) && GetLadderSpeedRatio() > 0.f)
 	{
 		GetBaseCharacterOwner()->Mantle(true);
 		return;
