@@ -91,4 +91,28 @@ namespace PXTraceUtils
 
 		return bResult;
 	}
+
+	bool OverlapCapsuleBlockingByProfile(
+		const UWorld* World, const FVector& Pos, float CapsuleRadius,
+		float CapsuleHalfHeight, const FQuat& Rotation, FName ProfileName,
+		const FCollisionQueryParams& QueryParams, bool bDrawDebug, float DrawTime, FColor HitColor
+	)
+	{
+		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight);
+		const bool bResult = World->OverlapBlockingTestByProfile(Pos, Rotation, ProfileName, CollisionShape, QueryParams);
+
+#if ENABLE_DRAW_DEBUG
+		if (bDrawDebug && bResult)
+		{
+			DrawDebugCapsule(
+				World, Pos, CapsuleHalfHeight, CapsuleRadius,
+				Rotation,
+				HitColor,
+				false, DrawTime
+			);
+		}
+#endif
+
+		return bResult;
+	}
 }
