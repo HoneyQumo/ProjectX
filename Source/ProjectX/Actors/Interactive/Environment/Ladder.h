@@ -29,13 +29,13 @@ public:
 	FVector GetAttachFromTopAnimMontageStartingLocation() const;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters", meta = (ClampMin = 1.f, UIMin = 1.f))
 	float LadderHeight = 100.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters", meta = (ClampMin = 1.f, UIMin = 1.f))
 	float LadderWidth = 50.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters", meta = (ClampMin = 1.f, UIMin = 1.f))
 	float StepsInterval = 25.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ladder parameters")
