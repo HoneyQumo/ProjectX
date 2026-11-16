@@ -10,6 +10,82 @@
 
 void UPXBaseCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 {
+	if (bForceRotation)
+	{
+		FRotator CurrentRotation = UpdatedComponent->GetComponentRotation(); // Normalized
+		CurrentRotation.DiagnosticCheckNaN(TEXT("CharacterMovementComponent::PhysicsRotation(): CurrentRotation"));
+
+		FRotator DeltaRot = GetDeltaRotation(DeltaTime);
+		DeltaRot.DiagnosticCheckNaN(TEXT("CharacterMovementComponent::PhysicsRotation(): GetDeltaRotation"));
+
+		// Accumulate a desired new rotation.
+		constexpr float AngleTolerance = 1e-3f;
+
+		if (!CurrentRotation.Equals(ForceTargetRotation, AngleTolerance))
+		{
+			FRotator DesiredRotation = ForceTargetRotation;
+			FQuat _WorldToGravityTransform = FQuat::Identity;
+			FQuat _GravityToWorldTransform = FQuat::Identity;
+
+			if (HasCustomGravity())
+			{
+				FRotator GravityRelativeCurrentRotation = (_GravityToWorldTransform * CurrentRotation.Quaternion()).Rotator();
+				FRotator GravityRelativeDesiredRotation = (_GravityToWorldTransform * DesiredRotation.Quaternion()).Rotator();
+
+				// PITCH
+				if (!FMath::IsNearlyEqual(GravityRelativeCurrentRotation.Pitch, GravityRelativeDesiredRotation.Pitch, AngleTolerance))
+				{
+					GravityRelativeDesiredRotation.Pitch = FMath::FixedTurn(GravityRelativeCurrentRotation.Pitch, GravityRelativeDesiredRotation.Pitch, DeltaRot.Pitch);
+				}
+
+				// YAW
+				if (!FMath::IsNearlyEqual(GravityRelativeCurrentRotation.Yaw, GravityRelativeDesiredRotation.Yaw, AngleTolerance))
+				{
+					GravityRelativeDesiredRotation.Yaw = FMath::FixedTurn(GravityRelativeCurrentRotation.Yaw, GravityRelativeDesiredRotation.Yaw, DeltaRot.Yaw);
+				}
+
+				// ROLL
+				if (!FMath::IsNearlyEqual(GravityRelativeCurrentRotation.Roll, GravityRelativeDesiredRotation.Roll, AngleTolerance))
+				{
+					GravityRelativeDesiredRotation.Roll = FMath::FixedTurn(GravityRelativeCurrentRotation.Roll, GravityRelativeDesiredRotation.Roll, DeltaRot.Roll);
+				}
+
+				DesiredRotation = (_WorldToGravityTransform * GravityRelativeDesiredRotation.Quaternion()).Rotator();
+			}
+			else
+			{
+				// PITCH
+				if (!FMath::IsNearlyEqual(CurrentRotation.Pitch, DesiredRotation.Pitch, AngleTolerance))
+				{
+					DesiredRotation.Pitch = FMath::FixedTurn(CurrentRotation.Pitch, DesiredRotation.Pitch, DeltaRot.Pitch);
+				}
+
+				// YAW
+				if (!FMath::IsNearlyEqual(CurrentRotation.Yaw, DesiredRotation.Yaw, AngleTolerance))
+				{
+					DesiredRotation.Yaw = FMath::FixedTurn(CurrentRotation.Yaw, DesiredRotation.Yaw, DeltaRot.Yaw);
+				}
+
+				// ROLL
+				if (!FMath::IsNearlyEqual(CurrentRotation.Roll, DesiredRotation.Roll, AngleTolerance))
+				{
+					DesiredRotation.Roll = FMath::FixedTurn(CurrentRotation.Roll, DesiredRotation.Roll, DeltaRot.Roll);
+				}
+			}
+
+			// Set the new rotation.
+			DesiredRotation.DiagnosticCheckNaN(TEXT("CharacterMovementComponent::PhysicsRotation(): DesiredRotation"));
+			MoveUpdatedComponent(FVector::ZeroVector, DesiredRotation, /*bSweep*/ false);
+		}
+		else
+		{
+			ForceTargetRotation = FRotator::ZeroRotator;
+			bForceRotation = false;
+		}
+
+		return;
+	}
+
 	if (IsOnLadder())
 	{
 		return;
@@ -102,9 +178,36 @@ void UPXBaseCharacterMovementComponent::AttachToLadder(const ALadder* Ladder)
 	SetMovementMode(MOVE_Custom, static_cast<uint8>(ECustomMovementMode::CMOVE_Ladder));
 }
 
-void UPXBaseCharacterMovementComponent::DetachFromLadder()
+void UPXBaseCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod DetachFromLadderMethod)
 {
-	SetMovementMode(MOVE_Falling);
+	switch (DetachFromLadderMethod)
+	{
+	case EDetachFromLadderMethod::JumpOff:
+		FVector JumpDirection = CurrentLadder->GetActorForwardVector();
+		SetMovementMode(MOVE_Falling);
+
+		FVector JumpVelocity = JumpDirection * JumpOffFromLadderSpeed;
+
+		ForceTargetRotation = JumpDirection.ToOrientationRotator();
+		bForceRotation = true;
+
+		Launch(JumpVelocity);
+
+		break;
+
+	case EDetachFromLadderMethod::ReachingTheTop:
+		GetBaseCharacterOwner()->Mantle(true);
+		break;
+
+	case EDetachFromLadderMethod::ReachingTheBottom:
+		SetMovementMode(MOVE_Walking);
+		break;
+
+	case EDetachFromLadderMethod::Fall:
+	default:
+		SetMovementMode(MOVE_Falling);
+		break;
+	}
 }
 
 bool UPXBaseCharacterMovementComponent::IsOnLadder() const
@@ -157,12 +260,12 @@ void UPXBaseCharacterMovementComponent::PhysLadder(float deltaTime, int32 Iterat
 
 	if (NewPosProjection < MinLadderBottomOffset && GetLadderSpeedRatio() < 0.f)
 	{
-		DetachFromLadder();
+		DetachFromLadder(EDetachFromLadderMethod::ReachingTheBottom);
 		return;
 	}
 	if (NewPosProjection > (CurrentLadder->GetLadderHeight() - MaxLadderTopOffset) && GetLadderSpeedRatio() > 0.f)
 	{
-		GetBaseCharacterOwner()->Mantle(true);
+		DetachFromLadder(EDetachFromLadderMethod::ReachingTheTop);
 		return;
 	}
 
