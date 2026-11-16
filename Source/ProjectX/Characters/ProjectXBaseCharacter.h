@@ -8,6 +8,8 @@
 
 class AInteractiveActor;
 
+using TInteractiveActorsArray = TArray<AInteractiveActor*, TInlineAllocator<10>>;
+
 USTRUCT(BlueprintType)
 struct FMantlingSettings
 {
@@ -135,6 +137,5 @@ private:
 
 	const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
 
-	UPROPERTY()
-	TArray<AInteractiveActor*> AvailableInteractiveActors;
+	TInteractiveActorsArray AvailableInteractiveActors;
 };
